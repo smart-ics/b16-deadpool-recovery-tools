@@ -13,3 +13,4 @@ D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastruct
 D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\refint\Deadpool.Infrastructure.dll
 D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\Deadpool.Infrastructure.pdb
 D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\ref\Deadpool.Infrastructure.dll
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\Deadpool.Infrastructure.sourcelink.json

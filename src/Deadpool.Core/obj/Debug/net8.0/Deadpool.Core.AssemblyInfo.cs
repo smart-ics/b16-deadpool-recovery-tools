@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Deadpool.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bd945ddcac5c0ccb0a1a0fb0fe9a7222543e9c9f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cd19348fc278dec0dce7916f654fa3434a65769e")]
 [assembly: System.Reflection.AssemblyProductAttribute("Deadpool.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Deadpool.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

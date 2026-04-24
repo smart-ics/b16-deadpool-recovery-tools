@@ -10,3 +10,4 @@ D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Core\obj\De
 D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Core\obj\Debug\net8.0\refint\Deadpool.Core.dll
 D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Core\obj\Debug\net8.0\Deadpool.Core.pdb
 D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Core\obj\Debug\net8.0\ref\Deadpool.Core.dll
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Core\obj\Debug\net8.0\Deadpool.Core.sourcelink.json

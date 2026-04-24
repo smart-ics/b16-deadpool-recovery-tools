@@ -132,3 +132,4 @@ D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Cli\bin\Deb
 D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Cli\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Cli\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
 D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Cli\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Cli\obj\Debug\net8.0\Deadpool.Cli.sourcelink.json
