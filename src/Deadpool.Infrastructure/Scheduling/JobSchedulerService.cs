@@ -1,5 +1,6 @@
 using Deadpool.Core.Domain.Enums;
 using Deadpool.Core.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
@@ -12,7 +13,7 @@ namespace Deadpool.Infrastructure.Scheduling;
 /// </summary>
 internal sealed class JobSchedulerService : IJobSchedulerService
 {
-    private readonly IDatabaseProfileRepository _profileRepository;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<JobSchedulerService> _logger;
 
     // Quartz job type — resolved dynamically at runtime from Deadpool.Cli assembly
@@ -20,10 +21,10 @@ internal sealed class JobSchedulerService : IJobSchedulerService
         ?? throw new InvalidOperationException("BackupJob type not found in Deadpool.Cli assembly.");
 
     public JobSchedulerService(
-        IDatabaseProfileRepository profileRepository,
+        IServiceScopeFactory scopeFactory,
         ILogger<JobSchedulerService> logger)
     {
-        _profileRepository = profileRepository;
+        _scopeFactory = scopeFactory;
         _logger = logger;
     }
 
@@ -31,7 +32,11 @@ internal sealed class JobSchedulerService : IJobSchedulerService
     {
         _logger.LogInformation("Loading active database profiles for scheduling...");
 
-        var profiles = await _profileRepository.GetAllActiveAsync(cancellationToken);
+        // Create scope to resolve scoped IDatabaseProfileRepository
+        await using var scope = _scopeFactory.CreateAsyncScope();
+        var profileRepository = scope.ServiceProvider.GetRequiredService<IDatabaseProfileRepository>();
+
+        var profiles = await profileRepository.GetAllActiveAsync(cancellationToken);
         var profileList = profiles.ToList();
 
         if (!profileList.Any())

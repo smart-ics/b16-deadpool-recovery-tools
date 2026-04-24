@@ -24,5 +24,8 @@ public sealed class DeadpoolSettings
 
     /// <summary>Delay in seconds between copy retry attempts.</summary>
     public int CopyRetryDelaySeconds { get; set; } = 30;
+
+    /// <summary>ADO.NET connection string for the SQL Server instance being backed up.</summary>
+    public string SqlConnectionString { get; set; } = string.Empty;
 }
 

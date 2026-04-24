@@ -32,6 +32,7 @@
         },
         "frameworks": {
           "net8.0": {
+            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {}
           }
@@ -50,9 +51,14 @@
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "dependencies": {
             "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[10.0.7, )"
+            },
+            "Microsoft.Extensions.Options": {
               "target": "Package",
               "version": "[10.0.7, )"
             }
@@ -105,6 +111,7 @@
         },
         "frameworks": {
           "net8.0": {
+            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {
               "D:\\Project.Aktif\\_Published\\b16-deadpool-recovery-tools\\src\\Deadpool.Core\\Deadpool.Core.csproj": {
@@ -127,15 +134,28 @@
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "dependencies": {
             "Dapper": {
               "target": "Package",
               "version": "[2.1.72, )"
             },
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
             "Microsoft.Data.Sqlite": {
               "target": "Package",
               "version": "[10.0.7, )"
+            },
+            "Microsoft.Extensions.Options.ConfigurationExtensions": {
+              "target": "Package",
+              "version": "[10.0.7, )"
+            },
+            "Quartz": {
+              "target": "Package",
+              "version": "[3.18.0, )"
             },
             "Serilog.Extensions.Hosting": {
               "target": "Package",

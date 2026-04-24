@@ -4,4 +4,8 @@
     <Project Path="src/Deadpool.Core/Deadpool.Core.csproj" />
     <Project Path="src/Deadpool.Infrastructure/Deadpool.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Deadpool.Core.Tests/Deadpool.Core.Tests.csproj" />
+    <Project Path="tests/Deadpool.Infrastructure.Tests/Deadpool.Infrastructure.Tests.csproj" />
+  </Folder>
 </Solution>

@@ -1,27 +1,32 @@
+using Deadpool.Core.Configuration;
 using Deadpool.Core.Domain.Entities;
 using Deadpool.Core.Domain.Enums;
 using Deadpool.Core.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Deadpool.Core.Workflow;
 
 /// <summary>
 /// Orchestrates the full backup workflow state machine.
 ///
-/// State transitions:
+/// State transitions (happy path):
 ///   Pending → Running → BackupCompleted → Copying → Verified → Success
-///                                                 ↘ RetryPending (up to 3x) → Failed
-///            ↘ Failed (precheck or backup failure – no automatic retry)
+///
+/// Copy failure path (max 3 attempts):
+///   Copying → RetryPending → Copying → ... → Failed
+///
+/// Precheck / backup failure (no retry):
+///   Pending → [Running] → Failed
 /// </summary>
 public sealed class BackupWorkflow
 {
-    private const int MaxCopyAttempts = 3;
-
     private readonly IPrecheckService _precheckService;
     private readonly IBackupExecutor _backupExecutor;
     private readonly IFileCopyService _fileCopyService;
     private readonly IBackupJobRepository _jobRepository;
     private readonly IBackupCatalogRepository _catalogRepository;
+    private readonly DeadpoolSettings _settings;
     private readonly ILogger<BackupWorkflow> _logger;
 
     public BackupWorkflow(
@@ -30,6 +35,7 @@ public sealed class BackupWorkflow
         IFileCopyService fileCopyService,
         IBackupJobRepository jobRepository,
         IBackupCatalogRepository catalogRepository,
+        IOptions<DeadpoolSettings> settings,
         ILogger<BackupWorkflow> logger)
     {
         _precheckService = precheckService;
@@ -37,6 +43,7 @@ public sealed class BackupWorkflow
         _fileCopyService = fileCopyService;
         _jobRepository = jobRepository;
         _catalogRepository = catalogRepository;
+        _settings = settings.Value;
         _logger = logger;
     }
 
@@ -44,9 +51,12 @@ public sealed class BackupWorkflow
     /// Entry point called by the Quartz job.
     /// Creates a new BackupJob and drives it through the state machine.
     /// </summary>
-    public async Task RunAsync(DatabaseProfile profile, BackupType backupType, CancellationToken cancellationToken = default)
+    public async Task RunAsync(
+        DatabaseProfile profile,
+        BackupType backupType,
+        CancellationToken cancellationToken = default)
     {
-        // Guard: one active job per database
+        // ── Guard: one active job per database at a time ──────────────────────
         var existing = await _jobRepository.GetActiveJobAsync(profile.DatabaseId, cancellationToken);
         if (existing is not null)
         {
@@ -56,6 +66,7 @@ public sealed class BackupWorkflow
             return;
         }
 
+        // ── Create job in Pending state ───────────────────────────────────────
         var job = new BackupJob
         {
             JobId = Guid.NewGuid(),
@@ -64,26 +75,27 @@ public sealed class BackupWorkflow
             ScheduledAt = DateTime.UtcNow,
             State = BackupJobState.Pending
         };
-
         await _jobRepository.AddAsync(job, cancellationToken);
-        _logger.LogInformation("Backup started: {JobId} | {Database} | {BackupType}", job.JobId, profile.DatabaseName, backupType);
+        _logger.LogInformation("Backup job created: {JobId} | {Database} | {BackupType}",
+            job.JobId, profile.DatabaseName, backupType);
 
-        // --- Step 1: Precheck ---
+        // ── Step 1: Precheck ──────────────────────────────────────────────────
         var precheck = await _precheckService.RunAsync(profile, backupType, cancellationToken);
         if (!precheck.Passed)
         {
-            await FailJobAsync(job.JobId, string.Join("; ", precheck.Failures), cancellationToken);
+            var reason = string.Join("; ", precheck.Failures);
+            _logger.LogError("Precheck failed for job {JobId}: {Reason}", job.JobId, reason);
+            await FailJobAsync(job.JobId, reason, cancellationToken);
             return;
         }
 
-        // --- Step 2: Execute backup ---
+        // ── Step 2: Execute backup → Running ─────────────────────────────────
         await _jobRepository.UpdateStateAsync(job.JobId, BackupJobState.Running, cancellationToken: cancellationToken);
         job.StartedAt = DateTime.UtcNow;
 
         string localFilePath;
         try
         {
-            // TODO: implement in IBackupExecutor
             localFilePath = await _backupExecutor.ExecuteAsync(profile, backupType, cancellationToken);
         }
         catch (Exception ex)
@@ -93,10 +105,11 @@ public sealed class BackupWorkflow
             return;
         }
 
+        // ── BackupCompleted ───────────────────────────────────────────────────
         await _jobRepository.UpdateStateAsync(job.JobId, BackupJobState.BackupCompleted, cancellationToken: cancellationToken);
-        _logger.LogInformation("Backup completed: {JobId} -> {File}", job.JobId, localFilePath);
+        _logger.LogInformation("Backup file written: {JobId} -> {File}", job.JobId, localFilePath);
 
-        // --- Step 3: Copy to storage (with retry) ---
+        // ── Step 3: Copy to storage (with retry) → Copying ───────────────────
         await _jobRepository.UpdateStateAsync(job.JobId, BackupJobState.Copying, cancellationToken: cancellationToken);
 
         var catalog = new BackupCatalog
@@ -111,38 +124,49 @@ public sealed class BackupWorkflow
         };
         await _catalogRepository.AddAsync(catalog, cancellationToken);
 
+        var destinationDir = BuildStoragePath(profile, backupType);
         string? storagePath = null;
-        for (var attempt = 1; attempt <= MaxCopyAttempts; attempt++)
+
+        for (var attempt = 1; attempt <= _settings.CopyMaxAttempts; attempt++)
         {
             try
             {
-                // TODO: resolve destination path from configuration / StoragePathResolver
-                var destinationRoot = string.Empty; // placeholder
-                storagePath = await _fileCopyService.CopyAsync(localFilePath, destinationRoot, MaxCopyAttempts, cancellationToken);
-                break;
+                storagePath = await _fileCopyService.CopyAsync(localFilePath, destinationDir, cancellationToken);
+                catalog.CopyAttempts = attempt;
+                break; // success — exit retry loop
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Copy retry {Attempt}/{Max} for job {JobId}", attempt, MaxCopyAttempts, job.JobId);
                 catalog.CopyAttempts = attempt;
+                _logger.LogWarning(ex, "Copy attempt {Attempt}/{Max} failed for job {JobId}",
+                    attempt, _settings.CopyMaxAttempts, job.JobId);
 
-                if (attempt < MaxCopyAttempts)
+                if (attempt < _settings.CopyMaxAttempts)
                 {
-                    await _jobRepository.UpdateStateAsync(job.JobId, BackupJobState.RetryPending, ex.Message, cancellationToken);
-                    await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
+                    // → RetryPending: wait then try again
+                    await _jobRepository.UpdateStateAsync(
+                        job.JobId, BackupJobState.RetryPending, ex.Message, cancellationToken);
+
+                    await Task.Delay(
+                        TimeSpan.FromSeconds(_settings.CopyRetryDelaySeconds), cancellationToken);
+
+                    // back to Copying for next attempt
+                    await _jobRepository.UpdateStateAsync(
+                        job.JobId, BackupJobState.Copying, cancellationToken: cancellationToken);
                 }
                 else
                 {
-                    await FailJobAsync(job.JobId, ex.Message, cancellationToken);
+                    // All attempts exhausted → Failed
                     catalog.Status = BackupJobState.Failed;
                     catalog.ErrorMessage = ex.Message;
                     await _catalogRepository.UpdateAsync(catalog, cancellationToken);
+                    await FailJobAsync(job.JobId, ex.Message, cancellationToken);
                     return;
                 }
             }
         }
 
-        // --- Step 4: Verify copy ---
+        // ── Step 4: Verify copy ───────────────────────────────────────────────
         var verified = await _fileCopyService.VerifyAsync(localFilePath, storagePath!, cancellationToken);
         if (!verified)
         {
@@ -154,7 +178,7 @@ public sealed class BackupWorkflow
 
         await _jobRepository.UpdateStateAsync(job.JobId, BackupJobState.Verified, cancellationToken: cancellationToken);
 
-        // --- Step 5: Update catalog & mark success ---
+        // ── Step 5: Update catalog & mark Success ────────────────────────���────
         catalog.StoragePath = storagePath!;
         catalog.Verified = true;
         catalog.Status = BackupJobState.Success;
@@ -165,12 +189,24 @@ public sealed class BackupWorkflow
         _logger.LogInformation("Backup succeeded: {JobId}", job.JobId);
     }
 
-    // -------------------------------------------------------------------------
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private async Task FailJobAsync(Guid jobId, string reason, CancellationToken cancellationToken)
     {
-        _logger.LogError("Backup failed: {JobId} | {Reason}", jobId, reason);
+        _logger.LogError("Backup job failed: {JobId} | {Reason}", jobId, reason);
         await _jobRepository.UpdateStateAsync(jobId, BackupJobState.Failed, reason, cancellationToken);
+    }
+
+    private string BuildStoragePath(DatabaseProfile profile, BackupType backupType)
+    {
+        var subFolder = backupType switch
+        {
+            BackupType.Full => "FULL",
+            BackupType.Differential => "DIFF",
+            BackupType.TransactionLog => "LOG",
+            _ => "FULL"
+        };
+        return Path.Combine(_settings.StorageRoot, profile.DatabaseName, subFolder);
     }
 }
 

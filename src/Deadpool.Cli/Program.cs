@@ -1,3 +1,5 @@
+using Deadpool.Cli;
+using Deadpool.Cli.Jobs;
 using Deadpool.Infrastructure;
 using Quartz;
 using Serilog;
@@ -25,19 +27,21 @@ try
             outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}"));
 
     // ── Infrastructure (repositories, executors, workflow) ───────────────────
-    builder.Services.AddDeadpoolInfrastructure();
+    builder.Services.AddDeadpoolInfrastructure(builder.Configuration);
+
+    // ── Quartz backup jobs ────────────────────────────────────────────────────
+    builder.Services.AddScoped<BackupJob>();
 
     // ── Quartz scheduler ─────────────────────────────────────────────────────
     builder.Services.AddQuartz(q =>
     {
-        // TODO: register backup Quartz jobs per DatabaseProfile loaded from catalog
-        // Example:
-        //   q.AddJob<FullBackupJob>(j => j.WithIdentity("full-HospitalA"));
-        //   q.AddTrigger(t => t.ForJob("full-HospitalA")
-        //       .WithCronSchedule("0 0 2 ? * SUN")
-        //       .WithMisfireHandlingInstructionFireAndProceed());
+        q.UseMicrosoftDependencyInjectionJobFactory();
+        // Jobs are registered dynamically by SchedulerBootstrapService at startup
     });
     builder.Services.AddQuartzHostedService(opt => opt.WaitForJobsToComplete = true);
+
+    // Register bootstrap service to load profiles and schedule jobs
+    builder.Services.AddHostedService<SchedulerBootstrapService>();
 
     // ── Windows Service / console dual-mode ──────────────────────────────────
     builder.Services.AddWindowsService(options => options.ServiceName = "Deadpool Backup Tools");
