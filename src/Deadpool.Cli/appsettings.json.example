@@ -1,0 +1,24 @@
+{
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Warning",
+        "Quartz": "Information"
+      }
+    }
+  },
+  "ConnectionStrings": {
+    "DeadpoolDb": "Data Source=deadpool.db"
+  },
+  "Deadpool": {
+    "SqlConnectionString": "Server=<DB_SERVER>;Database=<DB_NAME>;User Id=<USER>;Password=<PASSWORD>;",
+    "LocalBackupRoot": "C:\\Path\\To\\Backups",
+    "StorageRoot": "\\\\YourStorageServer\\Share\\Path",
+    "LocalRetentionDays": 3,
+    "StorageRetentionDays": 14,
+    "CopyMaxAttempts": 3,
+    "CopyRetryDelaySeconds": 30
+  }
+}
+

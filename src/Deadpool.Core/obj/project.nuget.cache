@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "I9AjD4UnFWY=",
+  "success": true,
+  "projectFilePath": "D:\\Project.Aktif\\_Published\\b16-deadpool-recovery-tools\\src\\Deadpool.Core\\Deadpool.Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\drury\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.7\\microsoft.extensions.dependencyinjection.abstractions.10.0.7.nupkg.sha512",
+    "C:\\Users\\drury\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.7\\microsoft.extensions.logging.abstractions.10.0.7.nupkg.sha512",
+    "C:\\Users\\drury\\.nuget\\packages\\system.diagnostics.diagnosticsource\\10.0.7\\system.diagnostics.diagnosticsource.10.0.7.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,15 @@
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\bin\Debug\net8.0\Deadpool.Infrastructure.deps.json
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\bin\Debug\net8.0\Deadpool.Infrastructure.dll
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\bin\Debug\net8.0\Deadpool.Infrastructure.pdb
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\bin\Debug\net8.0\Deadpool.Core.dll
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\bin\Debug\net8.0\Deadpool.Core.pdb
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\Deadpool.Infrastructure.csproj.AssemblyReference.cache
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\Deadpool.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\Deadpool.Infrastructure.AssemblyInfoInputs.cache
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\Deadpool.Infrastructure.AssemblyInfo.cs
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\Deadpool.Infrastructure.csproj.CoreCompileInputs.cache
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\Deadpool.FBFF8C1F.Up2Date
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\Deadpool.Infrastructure.dll
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\refint\Deadpool.Infrastructure.dll
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\Deadpool.Infrastructure.pdb
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Infrastructure\obj\Debug\net8.0\ref\Deadpool.Infrastructure.dll

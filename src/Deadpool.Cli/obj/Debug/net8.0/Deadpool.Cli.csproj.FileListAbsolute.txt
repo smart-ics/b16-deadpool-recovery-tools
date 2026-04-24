@@ -1,0 +1,5 @@
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Cli\obj\Debug\net8.0\Deadpool.Cli.csproj.AssemblyReference.cache
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Cli\obj\Debug\net8.0\Deadpool.Cli.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Cli\obj\Debug\net8.0\Deadpool.Cli.AssemblyInfoInputs.cache
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Cli\obj\Debug\net8.0\Deadpool.Cli.AssemblyInfo.cs
+D:\Project.Aktif\_Published\b16-deadpool-recovery-tools\src\Deadpool.Cli\obj\Debug\net8.0\Deadpool.Cli.csproj.CoreCompileInputs.cache

@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Deadpool.Cli/Deadpool.Cli.csproj" />
+    <Project Path="src/Deadpool.Core/Deadpool.Core.csproj" />
+    <Project Path="src/Deadpool.Infrastructure/Deadpool.Infrastructure.csproj" />
+  </Folder>
+</Solution>
